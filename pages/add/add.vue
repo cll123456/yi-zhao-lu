@@ -1,20 +1,31 @@
 <template>
-	<view>
-		<my-header title="添加"></my-header>
-		<my-footer></my-footer>
+	<view class="app-container">
+		<my-header title="首页"></my-header>
+		<view class="info-container">
+			<view>
+			  <text>客户名字</text>
+			</view>
+		</view>
 	</view>
+
+  </view>
 </template>
 
 <script>
-	export default {
-		data() {
-			return {
-				
-			};
-		}
-	}
+export default {
+  name: "add"
+}
 </script>
 
-<style lang="less">
-
+<style scoped lang="scss">
+.app-container {
+  background: #efeff4;
+  .info-container {
+    padding: 2%;
+    width: 100%;
+    height: calc(100vh - 120rpx);
+    background: #fff;
+    box-sizing: border-box;
+  }
+}
 </style>
