@@ -1,5 +1,5 @@
 <template>
-	<view>
+	<view class="app-container">
 		<my-header title="个人中心"></my-header>
 		<my-footer></my-footer>
 	</view>
