@@ -1,0 +1,17 @@
+// 混合
+
+// 超出一行打点
+@mixin overOneDot {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// 配置底部安全距离
+
+@mixin useSafeDis($dis) {
+	height: calc($dis + constant(safe-area-inset-bottom));//兼容 IOS<11.2
+	height: calc($dis + env(safe-area-inset-bottom));//兼容 IOS>11.2
+	padding-bottom: constant(safe-area-inset-bottom);//兼容 IOS<11.2
+	padding-bottom: env(safe-area-inset-bottom);//兼容 IOS>11.2
+}
