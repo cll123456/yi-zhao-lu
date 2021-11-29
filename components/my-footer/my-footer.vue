@@ -2,31 +2,58 @@
 	<view class="my-container">
 		<uni-row class="demo-uni-row">
 			<uni-col :span="8" class="col-container">
-				<view class="tabbar-container">
-					<uni-icons type="home" size="20"></uni-icons>
-					<view>首页</view>
-				</view>
+				<navigator :url="homePath" hover-class="other-navigator-hover">
+					<view class="tabbar-container" :style="{color: $route.path === homePath ? activedColor : ''}">
+						<uni-icons type="home" size="20" :color=" $route.path === homePath ? activedColor : ''">
+						</uni-icons>
+						<view>首页</view>
+					</view>
+				</navigator>
 			</uni-col>
 			<uni-col :span="8" class="col-container">
-
-				<uni-icons class="add-container" type="plusempty" size="40"></uni-icons>
+				<navigator :url="addPath" hover-class="other-navigator-hover">
+					<uni-icons class="add-container" type="plusempty" size="40"
+						:color=" $route.path === addPath ? activedColor : ''"></uni-icons>
+				</navigator>
 			</uni-col>
 			<uni-col :span="8" class="col-container">
-				<view class="tabbar-container mine">
-					<uni-icons type="person" size="20"></uni-icons>
-					<view>我的</view>
-				</view>
+				<navigator :url="minePath" hover-class="other-navigator-hover">
+					<view class="tabbar-container mine" :style="{color: $route.path === minePath ? activedColor : ''}">
+						<uni-icons type="person" size="20" :color=" $route.path === minePath ? activedColor : ''">
+						</uni-icons>
+						<view>我的</view>
+					</view>
+				</navigator>
 			</uni-col>
 		</uni-row>
-
-
-
 	</view>
 </template>
 
 <script>
 	export default {
 		name: "my-footer",
+		props: {
+			// 激活颜色
+			activedColor: {
+				type: String,
+				default: '#fff'
+			},
+			// 主页面路径
+			homePath: {
+				type: String,
+				default: '/'
+			},
+			// 添加路径
+			addPath: {
+				type: String,
+				default: '/pages/add/add'
+			},
+			// 我的路径
+			minePath: {
+				type: String,
+				default: '/pages/mine/mine'
+			},
+		},
 		data() {
 			return {
 

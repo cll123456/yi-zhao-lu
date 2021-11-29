@@ -1,8 +1,22 @@
 {
 	"pages": [{
 		"path": "pages/index/index"
+	}, {
+		"path": "pages/add/add",
+		"style": {
+			"navigationBarTitleText": "",
+			"enablePullDownRefresh": false
+		}
+
+	}, {
+		"path": "pages/mine/mine",
+		"style": {
+			"navigationBarTitleText": "",
+			"enablePullDownRefresh": false
+		}
+
 	}],
 	"globalStyle": {
-		"navigationStyle":"custom"
+		"navigationStyle": "custom"
 	}
 }

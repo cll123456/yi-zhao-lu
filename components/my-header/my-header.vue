@@ -50,7 +50,7 @@
 
 	.header-container {
 		height: 120rpx;
-		background: linear-gradient(45deg, $uni-primary, $uni-success);
+		background: linear-gradient(45deg, $uni-primary, $uni-error);
 		display: flex;
 		align-items: center;
 		justify-content: center;
