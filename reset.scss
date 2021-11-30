@@ -22,10 +22,14 @@
 	height: 100vh;
 	display: flex;
 	flex-direction: column;
-	
+	font-size: 32rpx;
 }
 
 .exclude-layout-container{
 	height: calc(100vh - 220rpx);
 	overflow: auto;
 }
+
+
+
+
