@@ -60,7 +60,7 @@
     },
     "h5" : {
         "title" : "衣着录",
-        "template" : "index.html",
+        "template" : "",
         "router" : {
             "mode" : "hash"
         },

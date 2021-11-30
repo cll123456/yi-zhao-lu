@@ -70,16 +70,17 @@
 		position: absolute;
 		background: lighten($color: $uni-primary, $amount: 30);
 		bottom: 0;
+		height: 100rpx;
 		// 添加底部安全距离
-		height: calc(100rpx + constant(safe-area-inset-bottom)); //兼容 IOS<11.2
-		height: calc(100rpx + env(safe-area-inset-bottom)); //兼容 IOS>11.2
-		padding-bottom: constant(safe-area-inset-bottom); //兼容 IOS<11.2
-		padding-bottom: env(safe-area-inset-bottom); //兼容 IOS>11.2
+		// height: calc(100rpx + constant(safe-area-inset-bottom)); //兼容 IOS<11.2
+		// height: calc(100rpx + env(safe-area-inset-bottom)); //兼容 IOS>11.2
+		// padding-bottom: constant(safe-area-inset-bottom); //兼容 IOS<11.2
+		// padding-bottom: env(safe-area-inset-bottom); //兼容 IOS>11.2
 
-		// 如果不支持安全距离，直接使用高度固定
-		@supports not (height: calc(100rpx + constant(safe-area-inset-bottom))) {
-			height: 100rpx;
-		}
+		// // 如果不支持安全距离，直接使用高度固定
+		// @supports not (height: calc(100rpx + constant(safe-area-inset-bottom))) {
+		// 	height: 100rpx;
+		// }
 
 
 		.demo-uni-row {
