@@ -1,6 +1,6 @@
 <template>
 	<view class="app-container">
-		<my-header title="首页"></my-header>
+		<my-header title="账单录入"></my-header>
 		<view class="info-container">
 			<view>
 			  <text>客户名字</text>
