@@ -10,18 +10,22 @@
 						<view v-for="(item, index) in viewCount" :key="index" v-show="visibleData[index] !== undefined">
 							<slot name="default" :item="visibleData[index]"></slot>
 						</view>
-						<uni-load-more :status="loadingStatus" :iconSize="iconSize"></uni-load-more>
+						<view>
+							<uni-load-more :status="loadingStatus" :iconSize="iconSize" ></uni-load-more>
+						</view> 
 					</view>
-				</view>	
+				</view>
 			</scroll-view>
 		</block>
 		<!-- 进行原生的普通遍历 -->
 		<block v-else>
-			<scroll-view scroll-y :style="{ height: scrollViewHeight + 'px' }">
+			<scroll-view scroll-y :style="{ height: scrollViewHeight }">
 				<view v-for="(item, index) in items" :key="index">
-					<slot name="default" :item="item"></slot>
+					<slot name="default" :item="item"></slot> 
 				</view>
-				<uni-load-more :status="loadingStatus" :iconSize="iconSize"></uni-load-more>
+				<view>
+					<uni-load-more :status="loadingStatus" :iconSize="iconSize" ></uni-load-more>
+				</view>
 			</scroll-view>
 		</block>
 	</view>
@@ -152,7 +156,7 @@
 			 * 滚动条触底
 			 * @param {Object} e
 			 */
-			scrollBottom(e){
+			scrollBottom(e) {
 				// 向上分发，触底了
 				console.log('是顶顶顶顶顶顶顶顶顶顶顶顶顶')
 				this.$emit('scrollBottom')

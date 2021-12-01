@@ -1,9 +1,11 @@
 <template>
-	<view class="header-container">
+	<view class="header-container" :style="{'height': appData.customBarH + 'px'}">
 		<view v-if="showBtn" class="icon-container" @click="goLastPage">
 			<uni-icons type="left" size="20"></uni-icons>
 		</view>
-		<text>{{ title }}</text>
+		<view class="tex-container" :style="{'top': appData.statusBarH + 10 + 'px'}">
+			<text>{{ title }}</text>
+		</view>
 	</view>
 </template>
 
@@ -18,8 +20,24 @@
 		},
 		data() {
 			return {
-
+				appData:{
+					statusBarH: 0,
+					customBarH: 0
+				}
 			};
+		},
+		created() {
+			const app = getApp()
+			// 获取状态栏和导航条高度
+			this.appData.statusBarH = app.globalData.statusBarH;
+			
+			
+			this.appData.customBarH = app.globalData.customBarH;
+			
+			// #ifdef MP-ALIPAY
+			this.appData.customBarH = app.globalData.customBarH - 20;
+			// #endif
+			
 		},
 		methods: {
 			/**
@@ -32,7 +50,9 @@
 				if (typeof this.$listeners.goLastPage === 'function') {
 					this.$listeners.goLastPage();
 				} else {
-					this.$router.go(-1);
+					uni.navigateBack({
+						delta: 1
+					})
 				}
 			}
 		}
@@ -49,16 +69,38 @@
 
 
 	.header-container {
-		height: 120rpx;
+		z-index: 2021;
 		background: linear-gradient(45deg, $uni-primary, $uni-error);
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		font-size: 32rpx;
 		color: #fff;
-		position: relative;
+		position: fixed;
 		user-select: none;
 		width: 100%;
+
+		// 支付宝小程序需要额外些样式
+		// #ifdef MP-ALIPAY
+		justify-content: flex-start;
+		padding-top: 30rpx;
+		padding-left: 80rpx;
+
+		.tex-container {
+			position: absolute;
+		}
+
+		// #endif
+
+		// 微信小程序的样式
+		// #ifdef MP-WEIXIN
+		.tex-container {
+			position: absolute;
+		}
+
+		// #endif
+
+
 
 		span {
 			width: 70%;

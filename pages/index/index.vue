@@ -1,13 +1,13 @@
 <template>
 	<view class="app-container">
 		<my-header title="首页"></my-header>
-		<view class="exclude-layout-container">
-			<longList :items="dataList" :minNum="20" :prepareViewNum="10" scrollViewHeight="calc(100vh -  220rpx)"
+		<view class="exclude-layout-container" :style="{'margin-top': customBarH + 'px'}">
+			<longList :items="dataList" :minNum="10" :prepareViewNum="10" :scrollViewHeight="`calc(100vh - ${customBarH }px - 100rpx)`"
 				:itemViewHeight="itemHeight" :visibleViewNum="10" :loadingStatus="loadingStatus"
 				@scrollBottom="getList">
-				<template v-slot:default="slotItem">
+				<template v-slot="{item}">
 					<view style="height: 80upx;border: 3rpx solid #000000;box-sizing: border-box; display: block;">
-						{{ slotItem.item ? slotItem.item.value : '空空' }}
+						{{ item ? item.value : '空空' }}
 					</view>
 				</template>
 			</longList>
@@ -22,8 +22,13 @@
 			return {
 				dataList: [],
 				itemHeight: 0,
-				loadingStatus: 'more'
+				loadingStatus: 'more',
+				customBarH: 0
 			}
+		},
+		created() {
+			const app = getApp()
+			this.customBarH = app.globalData.customBarH;
 		},
 		methods: {
 			goLastPage() {

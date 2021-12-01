@@ -26,8 +26,19 @@
 }
 
 .exclude-layout-container{
-	height: calc(100vh - 220rpx);
-	overflow: auto;
+	overflow: hidden;
+	width: 100%;
+	height: 100%;
+	// 添加底部安全距离
+	// margin-bottom: calc(100rpx + constant(safe-area-inset-bottom)); //兼容 IOS<11.2
+	// margin-bottom: calc(100rpx + env(safe-area-inset-bottom)); //兼容 IOS>11.2
+	
+	// // 如果不支持安全距离，直接使用高度固定
+	// @supports not (margin-bottom: calc(100rpx + constant(safe-area-inset-bottom))) {
+	// 	margin-bottom: 100rpx;
+	// }
+	
+	margin-bottom: 100rpx;
 }
 
 

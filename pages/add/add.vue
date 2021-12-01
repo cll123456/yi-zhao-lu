@@ -1,7 +1,7 @@
 <template>
 	<view class="app-container">
-		<my-header title="账单录入"></my-header>
-		<view class="info-container">
+		<my-header title="账单录入" :showBtn="true"></my-header>
+		<view class="info-container" :style="{'margin-top': customBarH + 'px'}">
 			<view class="container_row">
 			  <text class="row_title">客户名字</text>
         <text class="row_value f_bold">{{'王庆'}} <text class="row_icon">{{'>'}}</text> </text>
@@ -49,8 +49,13 @@ export default {
   data() {
     return {
       name:'',
-      remnant:0
+      remnant:0,
+	  customBarH: 0
     }
+  },
+  created() {
+  	const app = getApp()
+  	this.customBarH = app.globalData.customBarH;
   },
   methods: {
     watchInput(e){

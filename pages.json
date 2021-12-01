@@ -17,6 +17,13 @@
 
 	}],
 	"globalStyle": {
-		"navigationStyle": "custom"
+		"navigationStyle": "custom",
+		"mp-alipay": {
+			"transparentTitle": "always",
+			"titlePenetrate": "YES",
+			"allowsBounceVertical":"NO",
+			"showTitleLoading":"YES"
+			
+		}
 	}
 }
