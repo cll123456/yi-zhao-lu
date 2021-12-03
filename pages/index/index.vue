@@ -35,7 +35,6 @@
 
 			},
 			getList() {
-				console.log(111111111)
 				this.loadingStatus = 'loading';
 				if (this.dataList.length >= 200) {
 					this.loadingStatus = 'nomore';

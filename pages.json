@@ -15,15 +15,22 @@
 			"enablePullDownRefresh": false
 		}
 
+	}, {
+		"path": "pages/mine/updateInfo/updateInfo",
+		"style": {
+			"navigationBarTitleText": "",
+			"enablePullDownRefresh": false
+		}
+
 	}],
 	"globalStyle": {
 		"navigationStyle": "custom",
 		"mp-alipay": {
 			"transparentTitle": "always",
 			"titlePenetrate": "YES",
-			"allowsBounceVertical":"NO",
-			"showTitleLoading":"YES"
-			
+			"allowsBounceVertical": "NO",
+			"showTitleLoading": "YES"
+
 		}
 	}
 }
