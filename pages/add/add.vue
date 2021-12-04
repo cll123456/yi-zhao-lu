@@ -46,14 +46,16 @@
       <view class="container_col">
         <view class="sign_title">
           <text>签名</text>
-          <uni-icons @click="isSign=true" type="compose" color="#0E9CFF" size="30"></uni-icons>
+          <uni-icons @click="openSign" type="compose" color="#0E9CFF" size="30"></uni-icons>
         </view>
         <view class="col_sign">
-          <image class="sign_img" src="https://hellouniapp.dcloud.net.cn/static/img/uni.png"></image>
+          <image v-if="img" :class="{'sign_img':img}" :src="img"></image>
         </view>
       </view>
     </view>
-    <MySign v-if="isSign" @closeBrush="closeBrush"/>
+    <uni-popup ref="popup" type="bottom">
+        <MySign @closeBrush="closeBrush" @saveImage="saveImage"/>
+    </uni-popup>
     <view class="foot_button">
       <view class="confirm">确认</view>
     </view>
@@ -71,7 +73,8 @@ export default {
       name: '',
       remnant: 0,
       customBarH: 0,
-      isSign:false
+      isSign:false,
+      img:'',
     }
   },
   created() {
@@ -80,10 +83,18 @@ export default {
   },
   methods: {
     closeBrush(){
-      this.isSign=false
+      this.$refs.popup.close();
     },
     watchInput(e) {
       this.remnant = e.detail.value.length
+    },
+    openSign(){
+      this.$refs.popup.open('bottom')
+    },
+    saveImage(val){
+      this.$refs.popup.close();
+      console.log(val);
+      this.img=val;
     }
   }
 }
@@ -246,5 +257,8 @@ export default {
     }
 
   }
+}
+.uni-popup .uni-popup__wrapper{
+  height: 500px!important;
 }
 </style>

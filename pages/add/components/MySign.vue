@@ -1,13 +1,13 @@
 <template>
   <view class="myBrush-container" ref="myBrush">
     <view class="brush_btn">
-      <view class="resign" @click="closeBrush" @touchend="closeBrush">取消</view>
+      <view class="resign" @touchend="closeBrush">取消</view>
       <text class="title">手写签名</text>
-      <view class="confirm" :disabled="!this.hasDrew" @click="generate" @touchend="generate">完成</view>
+      <view class="confirm" @touchend="finish">完成</view>
     </view>
     <view class="brush_content">
-      <canvas canvas-id="canvas" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd"></canvas>
-      <uni-icons @touchend="resetDraw" class="content_img" type="trash" color="#0E9CFF" size="30"></uni-icons>
+      <canvas canvas-id="myCanvas" @touchstart="touchStart" @touchmove="touchMoved" @touchend="touchEnd"></canvas>
+      <uni-icons  class="content_img" type="trash" color="#0E9CFF" size="30" @touchend="clearBrush" @click="clearBrush"></uni-icons>
     </view>
   </view>
 </template>
@@ -15,7 +15,7 @@
 <script>
 export default {
   name: "MySign",
-  mounted() {
+ async mounted() {
     this.init()
     // 在画板以外松开鼠标后冻结画笔
     document.onmouseup = () => {
@@ -38,23 +38,11 @@ export default {
       type: String,
       default: '#FFF'
     },
-    //是否裁剪 在画布设定尺寸基础上裁掉四周空白部分
-    isCrop: {
-      type: Boolean,
-      default: false
-    }
   },
   data() {
     return {
-      ctx: {},
-      hasDrew: false,
-      resultImg: '',
-      points: [],
-      canvasTxt: null,
-      startX: 0,
-      startY: 0,
-      isDrawing: false,//是否绘制
-      sratio: 1,//宽比率
+      ctx:{},         //绘图图像
+      points:[]       //路径点集合
     }
   },
   computed: {
@@ -64,187 +52,88 @@ export default {
   },
   methods: {
     init() {
-      const canvas = uni.createCanvasContext('canvas')
-      canvas.height = this.$refs.myBrush.offsetHeight;
-      canvas.width = this.$refs.myBrush.offsetWidth;
-      console.log(canvas);
-      // canvas.style.background = this.myBg
-      const realW = parseFloat(window.getComputedStyle(canvas).width)
-      this.canvasTxt = canvas.getContext('2d')
-      this.canvasTxt.scale(1 * this.sratio, 1 * this.sratio)
-      this.sratio = realW / this.$refs.myBrush.offsetWidth
-      this.canvasTxt.scale(1 / this.sratio, 1 / this.sratio)
+      this.ctx = uni.createCanvasContext('myCanvas',this)
+      this.ctx.height = this.$refs.myBrush.offsetHeight;
+      this.ctx.width = this.$refs.myBrush.offsetWidth;
+      this.ctx.setFillStyle(this.myBg)
+      this.ctx.lineWidth = this.lineWidth;
+      this.ctx.lineCap = "round"
+      this.ctx.lineJoin = "round"
     },
-    // mobile
-    touchStart(e) {
-      e = e || event
-      e.preventDefault()
-      this.hasDrew = true
-      if (e.touches.length === 1) {
-        let obj = {
-          x: e.targetTouches[0].clientX - uni.createCanvasContext('canvas').getBoundingClientRect().left,
-          y: e.targetTouches[0].clientY - uni.createCanvasContext('canvas').getBoundingClientRect().top
-        }
-        this.drawStart(obj)
+    //触摸开始，获取到起点
+    touchStart(e){
+      let startX = e.changedTouches[0].x;
+      let startY = e.changedTouches[0].y;
+      let startPoint = {X:startX,Y:startY};
+
+      /* **************************************************
+          #由于uni对canvas的实现有所不同，这里需要把起点存起来
+       * **************************************************/
+      this.points.push(startPoint);
+
+      //每次触摸开始，开启新的路径
+      this.ctx.beginPath();
+    },
+
+    //触摸移动，获取到路径点
+    touchMoved(e){
+      let moveX = e.changedTouches[0].x;
+      let moveY = e.changedTouches[0].y;
+      let movePoint = {X:moveX,Y:moveY};
+      this.points.push(movePoint);       //存点
+      let len = this.points.length;
+      if(len>=2){
+        this.draw();                   //绘制路径
       }
-    },
-    touchMove(e) {
-      e = e || event
-      e.preventDefault()
-      if (e.touches.length === 1) {
-        let obj = {
-          x: e.targetTouches[0].clientX - uni.createCanvasContext('canvas').getBoundingClientRect().left,
-          y: e.targetTouches[0].clientY - uni.createCanvasContext('canvas').getBoundingClientRect().top
-        }
-        this.drawMove(obj)
-      }
-    },
-    touchEnd(e) {
-      e = e || event
-      e.preventDefault()
-      if (e.touches.length === 1) {
-        let obj = {
-          x: e.targetTouches[0].clientX - uni.createCanvasContext('canvas').getBoundingClientRect().left,
-          y: e.targetTouches[0].clientY - uni.createCanvasContext('canvas').getBoundingClientRect().top
-        }
-        this.drawEnd(obj)
-      }
-    },
-    // 绘制
-    drawStart(obj) {
-      this.startX = obj.x
-      this.startY = obj.y
-      this.canvasTxt.beginPath()
-      this.canvasTxt.moveTo(this.startX, this.startY)
-      this.canvasTxt.lineTo(obj.x, obj.y)
-      this.canvasTxt.lineCap = 'round'
-      this.canvasTxt.lineJoin = 'round'
-      this.canvasTxt.lineWidth = this.lineWidth * this.sratio
-      this.canvasTxt.stroke()
-      this.canvasTxt.closePath()
-      this.points.push(obj)
-    },
-    /**
-     * 移动
-     */
-    drawMove(obj) {
-      this.canvasTxt.beginPath()
-      this.canvasTxt.moveTo(this.startX, this.startY)
-      this.canvasTxt.lineTo(obj.x, obj.y)
-      this.canvasTxt.strokeStyle = this.lineColor
-      this.canvasTxt.lineWidth = this.lineWidth * this.sratio
-      this.canvasTxt.lineCap = 'round'
-      this.canvasTxt.lineJoin = 'round'
-      this.canvasTxt.stroke()
-      this.canvasTxt.closePath()
-      this.startY = obj.y
-      this.startX = obj.x
-      this.points.push(obj)
-    },
-    /**
-     *结束绘制
-     */
-    drawEnd(obj) {
-      this.canvasTxt.beginPath()
-      this.canvasTxt.moveTo(this.startX, this.startY)
-      this.canvasTxt.lineTo(obj.x, obj.y)
-      this.canvasTxt.lineCap = 'round'
-      this.canvasTxt.lineJoin = 'round'
-      this.canvasTxt.stroke()
-      this.canvasTxt.closePath()
-      this.points.push(obj)
-      this.points.push({x: -1, y: -1})
-    },
-    // 操作
-    async generate() {
-      if (!this.hasDrew) {
-        this.$message.warning(`Warning: Not Signned!`)
-        return
-      }
-      var resImgData = this.canvasTxt.getImageData(0, 0, uni.createCanvasContext('canvas').width, uni.createCanvasContext('canvas').height)
-      this.canvasTxt.globalCompositeOperation = "destination-over"
-      this.canvasTxt.fillStyle = this.myBg
-      this.canvasTxt.fillRect(0, 0, uni.createCanvasContext('canvas').width, uni.createCanvasContext('canvas').height)
-      this.resultImg = uni.createCanvasContext('canvas').toDataURL('image/png');
-      uni.createCanvasContext('canvas').toBlob(async (blobObj) => {
-        const file1 = new File([blobObj], "signature.png", {
-          type: blobObj.type,
-          lastModified: Date.now(),
-        });
-        console.log(file1);
-      })
-      var resultImg = this.resultImg
-      this.canvasTxt.clearRect(0, 0, uni.createCanvasContext('canvas').width, uni.createCanvasContext('canvas').height)
-      this.canvasTxt.putImageData(resImgData, 0, 0)
-      this.canvasTxt.globalCompositeOperation = "source-over"
-      if (this.isCrop) {
-        const crop_area = this.getCropArea(resImgData.data)
-        var crop_canvas = document.createElement('canvas')
-        const crop_ctx = crop_canvas.getContext('2d')
-        crop_canvas.width = crop_area[2] - crop_area[0]
-        crop_canvas.height = crop_area[3] - crop_area[1]
-        const crop_imgData = this.canvasTxt.getImageData(...crop_area)
-        crop_ctx.globalCompositeOperation = "destination-over"
-        crop_ctx.putImageData(crop_imgData, 0, 0)
-        crop_ctx.fillStyle = this.myBg
-        crop_ctx.fillRect(0, 0, crop_canvas.width, crop_canvas.height)
-        resultImg = crop_canvas.toDataURL()
-        crop_canvas = null
-      }
-      console.log(resultImg)
 
     },
-    /**
-     * 重绘
-     */
-    resetDraw() {
-      this.canvasTxt.clearRect(
-          0,
-          0,
-          uni.createCanvasContext('canvas').width,
-          uni.createCanvasContext('canvas').height
-      )
-      this.$emit('update:bgColor', '')
-      uni.createCanvasContext('canvas').style.background = 'rgba(255, 255, 255, 0)'
-      this.points = []
-      this.hasDrew = false
-      this.resultImg = ''
+
+    // 触摸结束，将未绘制的点清空防止对后续路径产生干扰
+    touchEnd(){
+      this.points=[];
     },
-    /**
-     * 关闭画板
-     */
-    closeBrush() {
-      this.resetDraw();
-      this.$emit("closeBrush")
+
+    /* ***********************************************
+    #   绘制笔迹
+    #   1.为保证笔迹实时显示，必须在移动的同时绘制笔迹
+    #   2.为保证笔迹连续，每次从路径集合中区两个点作为起点（moveTo）和终点(lineTo)
+    #   3.将上一次的终点作为下一次绘制的起点（即清除第一个点）
+    ************************************************ */
+    draw() {
+      let point1 = this.points[0]
+      let point2 = this.points[1]
+      this.points.shift()
+      this.ctx.moveTo(point1.X, point1.Y)
+      this.ctx.lineTo(point2.X, point2.Y)
+      this.ctx.stroke()
+      this.ctx.draw(true)
     },
-    /**
-     * 修剪区域
-     * @param imgData
-     * @returns {(number|number)[]}
-     */
-    getCropArea(imgData) {
-      var topX = uni.createCanvasContext('canvas').width;
-      var btmX = 0;
-      var topY = uni.createCanvasContext('canvas').height;
-      var btnY = 0
-      for (var i = 0; i < uni.createCanvasContext('canvas').width; i++) {
-        for (var j = 0; j < uni.createCanvasContext('canvas').height; j++) {
-          var pos = (i + uni.createCanvasContext('canvas').width * j) * 4
-          if (imgData[pos] > 0 || imgData[pos + 1] > 0 || imgData[pos + 2] || imgData[pos + 3] > 0) {
-            btnY = Math.max(j, btnY)
-            btmX = Math.max(i, btmX)
-            topY = Math.min(j, topY)
-            topX = Math.min(i, topX)
-          }
+
+    //清空画布
+    clearBrush(e){
+      let canvasH = this.$refs.myBrush.$el.offsetHeight;
+      let canvasW = this.$refs.myBrush.$el.offsetWidth;
+      this.ctx.clearRect(0, 0, canvasW, canvasH);
+      this.ctx.draw(true);
+    },
+
+    //完成绘画并保存到本地
+    finish(){
+      uni.canvasToTempFilePath({
+        canvasId: 'myCanvas',
+        success: (res)=> {
+          let path = res.tempFilePath;
+          this.$emit('saveImage',path)
         }
-      }
-      topX++
-      btmX++
-      topY++
-      btnY++
-      return [topX, topY, btmX, btnY]
+      })
+    },
+    /**
+     *
+     */
+    closeBrush(){
+      this.$emit('closeBrush')
     }
-  }
+  },
 }
 </script>
 
@@ -254,7 +143,7 @@ export default {
   flex-direction: column;
   align-items: center;
   width: 100%;
-  height: 50%;
+  height: 700rpx;
   position: fixed;
   bottom: 0;
   background-color: #fff;
@@ -293,7 +182,8 @@ export default {
 
     .confirm {
       background: #409EFF;
-      width: 18%;
+      width: 100rpx;
+      text-align: center;
     }
   }
 
@@ -316,6 +206,7 @@ export default {
       right: 10%;
       width: 48rpx;
       height: 48rpx;
+      z-index: 1;
     }
   }
 }
